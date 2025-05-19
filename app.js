@@ -39,7 +39,7 @@ app.post('/slack', async (req, res) => {
         }
 
         const channel = slackData.event.channel;
-        let channelName = null;
+        let channelName = channel;
         console.dir(slackData.event.channel);
         switch (channel){
             case "C05J46JSUF5":

@@ -22,6 +22,9 @@ const CHANNEL_MAP = {
     "C05J46JSUF5": "dev-general",
     "C08JURBH684": "tn-content"
 };
+const USER_MAP = {
+    "U05HU2CS1FX": "Chris.Chiu"
+};
 
 // Slack Webhook 入口
 app.post('/slack', async (req, res) => {
@@ -45,12 +48,14 @@ app.post('/slack', async (req, res) => {
 
         const channel = slackData.event.channel;
         const channelName = CHANNEL_MAP[channel] || channel;
+        const user = slackData.event.user;
+        const userName = USER_MAP[user] || user;
 
         // 构造钉钉消息体（文本格式）
         const dingtalkData = {
             msgtype: "text",
             text: {
-                content: `【slack消息】\n${processedText}\n(消息来自群聊${channelName})`
+                content: `【slack消息】\n${userName}: ${processedText}\n(消息来自群聊${channelName})`
             }
         };
 

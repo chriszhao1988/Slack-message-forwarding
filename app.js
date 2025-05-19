@@ -38,11 +38,20 @@ app.post('/slack', async (req, res) => {
             processedText = slackText.substring(0, MAX_LENGTH) + '...';
         }
 
+        const channel = slackData.event.channel;
+        let channelName = null;
+        console.dir(slackData.event.channel);
+        switch (channel){
+            case "C05J46JSUF5":
+                channelName = "dev-general";
+                break;
+        }
+
         // 构造钉钉消息体（文本格式）
         const dingtalkData = {
             msgtype: "text",
             text: {
-                content: `【slack消息】\n${processedText}`
+                content: `【slack消息】\n${processedText}\n(消息来自群聊${channelName})`
             }
         };
 

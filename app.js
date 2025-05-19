@@ -8,12 +8,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 require('dotenv').config();
+const { WebClient } = require('@slack/web-api');
 
 const app = express();
 const PORT = process.env.PORT;
 
 // 钉钉 Webhook 地址（需替换为你的机器人地址）
 const DINGTALK_WEBHOOK = process.env.DINGTALK_WEBHOOK;
+
+const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 
 // 解析 Slack 的 JSON 格式请求体
 app.use(bodyParser.json());
@@ -22,9 +25,45 @@ const CHANNEL_MAP = {
     "C05J46JSUF5": "dev-general",
     "C08JURBH684": "tn-content"
 };
-const USER_MAP = {
-    "U05HU2CS1FX": "Chris.Chiu"
-};
+
+let userCache = {};
+
+// 初始化用户缓存
+async function initializeUserCache() {
+    const client = new WebClient(SLACK_BOT_TOKEN);
+    try {
+        const response = await client.users.list();
+        userCache = response.members.reduce((acc, user) => {
+            acc[user.id] = user.real_name || user.name;
+            return acc;
+        }, {});
+        console.log(`Initialized user cache with ${Object.keys(userCache).length} users`);
+    } catch (error) {
+        console.error('Failed to fetch user list:', error.message);
+    }
+}
+
+
+// 获取用户名（优先缓存）
+async function getUserName(userId) {
+    if (userCache[userId]) {
+        return userCache[userId];
+    }
+    const client = new WebClient(SLACK_BOT_TOKEN);
+    try {
+        const response = await client.users.info({ user: userId });
+        const username = response.user.name;
+        userCache[userId] = username;
+        return username;
+    } catch (error) {
+        console.error(`Failed to get user info for ${userId}:`, error.message);
+        return userId;
+    }
+}
+
+// 解析 JSON 请求体
+app.use(bodyParser.json());
+
 
 // Slack Webhook 入口
 app.post('/slack', async (req, res) => {
@@ -48,8 +87,8 @@ app.post('/slack', async (req, res) => {
 
         const channel = slackData.event.channel;
         const channelName = CHANNEL_MAP[channel] || channel;
-        const user = slackData.event.user;
-        const userName = USER_MAP[user] || user;
+        const userId = slackData.event.user;
+        const userName = await getUserName(userId);
 
         // 构造钉钉消息体（文本格式）
         const dingtalkData = {
@@ -75,6 +114,8 @@ app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
+    await initializeUserCache(); // 启动时初始化缓存
+    setInterval(initializeUserCache, 24 * 60 * 60 * 1000); // 每天刷新一次
     console.log(`Server running on port ${PORT}`);
 });

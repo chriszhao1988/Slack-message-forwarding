@@ -26,6 +26,7 @@ app.post('/slack', async (req, res) => {
         return res.status(200).send(challenge);
     }
     const slackData = req.body;
+    console.dir(slackData);
     const slackText = slackData.text || '无内容';
 
     // 构造钉钉消息体（文本格式）

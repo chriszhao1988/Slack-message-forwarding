@@ -26,24 +26,34 @@ app.post('/slack', async (req, res) => {
         return res.status(200).send(challenge);
     }
     const slackData = req.body;
-    console.dir(slackData);
-    const slackText = slackData.text || '无内容';
+    if(slackData.event.type==='message') {
+        const slackText = slackData.event.text || '无内容';
 
-    // 构造钉钉消息体（文本格式）
-    const dingtalkData = {
-        msgtype: "text",
-        text: {
-            content: `【消息】\n${slackText}`
+        // 定义最大长度
+        const MAX_LENGTH = 100;
+        let processedText = slackText;
+
+        // 如果内容过长，进行缩略
+        if (slackText.length > MAX_LENGTH) {
+            processedText = slackText.substring(0, MAX_LENGTH) + '...';
         }
-    };
 
-    try {
-        // 发送消息到钉钉
-        await axios.post(DINGTALK_WEBHOOK, dingtalkData);
-        res.status(200).send('Forwarded to DingTalk');
-    } catch (error) {
-        console.error('Failed to send to DingTalk:', error.message);
-        res.status(500).send('Failed to forward');
+        // 构造钉钉消息体（文本格式）
+        const dingtalkData = {
+            msgtype: "text",
+            text: {
+                content: `【slack消息】\n${processedText}`
+            }
+        };
+
+        try {
+            // 发送消息到钉钉
+            await axios.post(DINGTALK_WEBHOOK, dingtalkData);
+            res.status(200).send('Forwarded to DingTalk');
+        } catch (error) {
+            console.error('Failed to send to DingTalk:', error.message);
+            res.status(500).send('Failed to forward');
+        }
     }
 });
 

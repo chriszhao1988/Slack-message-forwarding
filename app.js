@@ -18,6 +18,11 @@ const DINGTALK_WEBHOOK = process.env.DINGTALK_WEBHOOK;
 // 解析 Slack 的 JSON 格式请求体
 app.use(bodyParser.json());
 
+const CHANNEL_MAP = {
+    "C05J46JSUF5": "dev-general",
+    "C08JURBH684": "tn-content"
+};
+
 // Slack Webhook 入口
 app.post('/slack', async (req, res) => {
     const { challenge } = req.body || {};
@@ -39,16 +44,7 @@ app.post('/slack', async (req, res) => {
         }
 
         const channel = slackData.event.channel;
-        let channelName = channel;
-        console.dir(slackData.event.channel);
-        switch (channel){
-            case "C05J46JSUF5":
-                channelName = "dev-general";
-                break;
-            case "C08JURBH684":
-                channelName = "tn-content";
-                break;
-        }
+        const channelName = CHANNEL_MAP[channel] || channel;
 
         // 构造钉钉消息体（文本格式）
         const dingtalkData = {

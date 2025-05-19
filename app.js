@@ -7,9 +7,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // 钉钉 Webhook 地址（需替换为你的机器人地址）
 const DINGTALK_WEBHOOK = process.env.DINGTALK_WEBHOOK;
@@ -26,7 +27,7 @@ app.post('/slack', async (req, res) => {
     const dingtalkData = {
         msgtype: "text",
         text: {
-            content: `【Slack消息】\n${slackText}`
+            content: `【消息】\n${slackText}`
         }
     };
 

@@ -26,8 +26,8 @@ app.post('/slack', async (req, res) => {
         return res.status(200).send(challenge);
     }
     const slackData = req.body;
-    if(slackData.event.type==='message') {
-        const slackText = slackData.event.text || '无内容';
+    if(slackData.event.type==='message' && slackData.event.text) {
+        const slackText = slackData.event.text;
 
         // 定义最大长度
         const MAX_LENGTH = 100;

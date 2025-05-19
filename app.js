@@ -45,6 +45,9 @@ app.post('/slack', async (req, res) => {
             case "C05J46JSUF5":
                 channelName = "dev-general";
                 break;
+            case "C08JURBH684":
+                channelName = "tn-content";
+                break;
         }
 
         // 构造钉钉消息体（文本格式）

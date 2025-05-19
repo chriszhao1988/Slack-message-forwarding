@@ -20,6 +20,11 @@ app.use(bodyParser.json());
 
 // Slack Webhook 入口
 app.post('/slack', async (req, res) => {
+    const { challenge } = req.body || {};
+    // 关键逻辑：验证 URL 时必须直接返回 challenge 值
+    if (challenge) {
+        return res.status(200).send(challenge);
+    }
     const slackData = req.body;
     const slackText = slackData.text || '无内容';
 

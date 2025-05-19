@@ -6,6 +6,7 @@ services:
     container_name: slack-to-dingtalk
     environment:
       - DINGTALK_WEBHOOK=https://oapi.dingtalk.com/robot/send?access_token=
+      - PORT=3099
     ports:
-      - "3000:3000"
+      - "3099:3099"
     restart: unless-stopped

@@ -23,7 +23,9 @@ app.use(bodyParser.json());
 
 const CHANNEL_MAP = {
     "C05J46JSUF5": "dev-general",
-    "C08JURBH684": "tn-content"
+    "C08JURBH684": "tn-content",
+    "D064QMBDUTD": "Linear",
+    "C0827BYN34H": "grafana-alert-sentinel"
 };
 
 let userCache = {};

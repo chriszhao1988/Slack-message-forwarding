@@ -108,7 +108,7 @@ app.post('/slack', async (req, res) => {
         const slackText = slackData.event.text;
 
         // 定义最大长度
-        const MAX_LENGTH = 100;
+        const MAX_LENGTH = 250;
         let processedText = await replaceMentionsWithNames(slackText);
 
         // 如果内容过长，进行缩略

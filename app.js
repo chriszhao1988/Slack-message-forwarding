@@ -121,7 +121,7 @@ app.post('/slack', async (req, res) => {
         const channel = slackData.event.channel;
         const channelName = CHANNEL_MAP[channel] || channel;
         const userId = slackData.event.user;
-        const userName = await getUserName(userId);
+        const userName = await getUserName(userId) || userId;
 
         // 构造钉钉消息体（文本格式）
         const dingtalkData = {
